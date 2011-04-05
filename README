@@ -1,0 +1,27 @@
+Concurrent Exception Handling Model
+===================================
+
+This is an implementation of the model proposed in <TODO - ref to paper>. It is implemented on top of Scala Actor Model.
+
+
+Dependencies
+------------
+
+* Maven (will install all other dependencies)
+* Scala 2.8
+
+Run
+---
+
+From the command-line execute:
+
+mvn scala:run -Dlauncher=App
+
+
+
+Authors
+-------
+
+Bruno Cabral
+Alcides Fonseca
+Paulo Marques
