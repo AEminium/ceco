@@ -7,12 +7,10 @@ import scala.actors.OutputChannel
 
 case object Ack
 case object Stop
-case class Register[E <: Exception ](implicit m: Manifest[E]) {
-  def test(e:Exception):Boolean = e.isInstanceOf[E]
+case class Register[E <: Exception](m: Manifest[E]) {
   def getType() = m
 }
-case class Unregister[E](implicit m: Manifest[E]) {
-  def test(e:Exception):Boolean = e.isInstanceOf[E]
+case class Unregister[E <: Exception](m: Manifest[E]) {
   def getType() = m
 }
 

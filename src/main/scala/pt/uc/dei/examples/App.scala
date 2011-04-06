@@ -57,8 +57,8 @@ class MessageSender extends Actor with ExceptionModel {
         _check
         println("Message " + i + " sent.")
       }
-    } _catch {
-      e:Exception => println("Got exception: " + e)
+    } _catch { e:RemoteException => 
+      println("Got exception: " + e)
     }
   }
   

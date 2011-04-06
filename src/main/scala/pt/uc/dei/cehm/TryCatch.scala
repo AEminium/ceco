@@ -1,28 +1,37 @@
 package pt.uc.dei.cehm
 
 class TryCatch(code: () => Unit) {
-  
-  def _catch(handler:Function[Exception,Unit]) = {
-    new TryCatchFinally(code)._catch(handler)._finally{}
+  def _catch[E <: Exception](handler:Function[E,Unit])(implicit m:Manifest[E]) = {
+    new TryCatchExecuter[E](code, handler, m)._finally{}
   }
 
 }
 
 class TryCatchFinally(code: () => Unit) {
-  var catcher:Function[Exception,Unit] = null;
-  def _catch(handler:Function[Exception,Unit]) = {
-    catcher = handler
-    this
+  def _catch[E <: Exception](handler:Function[E,Unit])(implicit m:Manifest[E]) = {
+    new TryCatchExecuter[E](code, handler, m)
   }
-  
+}
+
+
+class TryCatchExecuter[E <: Exception]
+      (code: () => Unit, catcher: E => Unit, m:Manifest[E]) {
   def _finally(fin: => Unit) {
     try {
-      ExceptionController !? new Register[Exception]
+      ExceptionController !? new Register[E](m)
       code()
     } catch {
-      case e : Exception => catcher(e)
+      case e:RemoteException => {
+        e match {
+            case e:E => catcher(e)
+            case _ => throw e
+        }
+      }
+      case e:Exception => {
+        throw e
+      }
     } finally {
-      ExceptionController !? new Unregister[Exception]()
+      ExceptionController !? new Unregister[E](m)
       fin
     }
   }
