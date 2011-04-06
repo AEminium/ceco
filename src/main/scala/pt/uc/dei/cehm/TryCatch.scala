@@ -45,9 +45,15 @@ class TryCatchRemoteExecuter[E <: Exception]
     e match {
       case e:RemoteException => e match {
           case e:E => catcher(e)
-          case _ => throw e
+          case _ => {
+            ExceptionController !? new Unregister[E](m)
+            throw e
+          }
       }
-      case e:Exception => throw e
+      case e:Exception => {
+        ExceptionController !? new Unregister[E](m)
+        throw e
+      }
     }
   }
         
