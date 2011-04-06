@@ -3,7 +3,7 @@
   <groupId>pt.uc.dei</groupId>
   <artifactId>exceptionmodel</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>${project.artifactId}</name>
+  <name>CEHM</name>
   <description>My wonderfull scala app</description>
   <inceptionYear>2010</inceptionYear>
   <licenses>
@@ -112,8 +112,8 @@
 	          <mainClass>pt.uc.dei.examples.email.MessageSending</mainClass>
 	        </launcher>
 			<launcher>
-	          <id>TreeMinimum</id>
-	          <mainClass>pt.uc.dei.examples.divide.TreeMinimum</mainClass>
+	          <id>TreeMaximum</id>
+	          <mainClass>pt.uc.dei.examples.divide.TreeMaximum</mainClass>
 	        </launcher>
 	        <!-- you could define other launcher -->
 	      </launchers>

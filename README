@@ -16,7 +16,7 @@ Run
 From the command-line execute:
 
 mvn scala:run -Dlauncher=MessageSending
-mvn scala:run -Dlauncher=TreeMinimum
+mvn scala:run -Dlauncher=TreeMaximum
 
 
 Authors
