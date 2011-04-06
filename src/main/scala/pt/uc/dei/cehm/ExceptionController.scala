@@ -32,7 +32,7 @@ object ExceptionController extends Actor {
           unregister(sender, r.getType)
           sender ! Ack
         }
-        case e:RemoteException => {
+        case e:Exception => {
           this << e
         }
         case Stop => exit()

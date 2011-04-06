@@ -5,8 +5,8 @@ import scala.actors.Actor
 import scala.actors.Actor._
 import pt.uc.dei.cehm._
 
-class AddressDoesNotExistException extends Exception
-class IOException extends Exception
+class AddressDoesNotExistException extends RemoteException
+class IOException extends RemoteException
 
 
 object MessageSending {
@@ -36,7 +36,7 @@ object messageController extends Actor with ExceptionModel {
       
     } _catch {
       e:RemoteException => 
-        e.getException match {
+        e match {
             case e:AddressDoesNotExistException => println("[Controller] Address does not exist")
             case e:IOException => println("[Controller] IO error")
         }

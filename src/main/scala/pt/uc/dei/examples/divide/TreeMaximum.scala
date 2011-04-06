@@ -6,7 +6,7 @@ import scala.actors.Actor._
 import scala.util.Random
 import pt.uc.dei.cehm._
 
-class InfiniteValue extends Exception
+class InfiniteValue extends RemoteException
 
 sealed abstract class Tree
 case class Node(left: Tree, right: Tree) extends Tree
@@ -40,16 +40,20 @@ object Controller extends Actor with ExceptionModel {
   }
   
   def act() {
+    ExceptionController.start
+    
     val tree = createRandomTree(0);
     val fjtask = new FJMaximum
     fjtask.start
     _try {
+  
       val i:Any = fjtask !? tree
       _check
       println("Maximum: " + i)
     } _catch {
       e:InfiniteValue => println("Infinite value present in Tree")
     }
+    ExceptionController ! Stop
     exit()
   }
 }
@@ -63,7 +67,11 @@ class FJMaximum extends Actor with ExceptionModel {
             val ans = e match {
               case n:EmptyNode[_] => n.value match {
                   case Real(n) => n 
-                  case Inf => { _throw(new InfiniteValue); 0 }
+                  case Inf => { 
+                    println("Found an infinit")
+                    _throw(new InfiniteValue)
+                    0
+                  }
               }
               case t:Node => {
                 def process(tr:Tree):Any = {
@@ -82,6 +90,7 @@ class FJMaximum extends Actor with ExceptionModel {
             exit()
           } _catch {
               e:InfiniteValue => {
+                println("Computation aborted")
                 sender ! 1
                 exit()
               }
