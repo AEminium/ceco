@@ -26,7 +26,7 @@ trait ExceptionModel extends Actor {
   }
   
   def _raise(e:Exception) {
-    ExceptionController ! new RemoteException(e)
+    ExceptionController ! e
   }
   
   def _check = {
