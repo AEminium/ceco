@@ -5,6 +5,8 @@ import scala.actors.Actor
 import scala.actors.Actor._
 import pt.uc.dei.cehm._
 
+class AddressDoesNotExistException extends Exception
+class IOException extends Exception
 
 case class Ack()
 case class MessageNotSent(val msg:String) extends Exception {
@@ -23,18 +25,22 @@ object messageController extends Actor with ExceptionModel {
     
     // initialize the system
     ExceptionController.start
-
-    def handle(e:Exception) = {
-      println("[Controller] Exception caught: " + e.getMessage)
-    }
     
     var futures:List[MessageSender] = List()
-    
-    (1 to 15).foreach { m =>
-      val ms = new MessageSender
-      ms.start
-      ms ! m
-      futures = ms :: futures
+    _try {
+      (1 to 15).foreach { m =>
+        val ms = new MessageSender
+        ms.start
+        ms ! m
+        futures = ms :: futures
+      }
+      _check
+    } _catch {
+      e:RemoteException => 
+        e.getException match {
+            case e:AddressDoesNotExistException => println("[Controller] Address does not exist")
+            case e:IOException => println("[Controller] IO error")
+        }
     }
     
     futures.foreach{ m => m !? Stop }
@@ -49,16 +55,19 @@ class MessageSender extends Actor with ExceptionModel {
     _try {
       if (i == 3) {
         Thread.sleep(5*1000)
-        _throw (new Exception("Hello"))
-      } 
+        _throw (new AddressDoesNotExistException)
+      } else if ( i == 7) {
+        Thread.sleep(5*1000)
+        _throw (new IOException)
+      }
       else {
-        println("Message " + i + " being sent.")
+        println("[Sender " + i + "] Message " + i + " being sent.")
         Thread.sleep(10*1000)
         _check
-        println("Message " + i + " sent.")
+        println("[Sender " + i + "] Message " + i + " sent.")
       }
-    } _catch { e:RemoteException => 
-      println("Got exception: " + e)
+    } _catch { e:Exception => 
+      println("[Sender " + i + "] Got local exception: " + e)
     }
   }
   
