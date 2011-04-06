@@ -74,14 +74,14 @@ class FJMaximum extends Actor with ExceptionModel {
                   }
               }
               case t:Node => {
-                def process(tr:Tree):Any = {
+                def process(tr:Tree):Future[Any] = {
                   val fjtask = new FJMaximum
                   fjtask.start
-                  fjtask !? tr
+                  fjtask !! tr
                 }
                 _check
-                val r:Int = process(t.right).asInstanceOf[Int]
-                val l:Int = process(t.left).asInstanceOf[Int]
+                val r:Int = process(t.right)().asInstanceOf[Int]
+                val l:Int = process(t.left)().asInstanceOf[Int]
                 _check
                 if (r > l) r else l
               }
