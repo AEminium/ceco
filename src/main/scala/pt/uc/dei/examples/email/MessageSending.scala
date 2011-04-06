@@ -1,4 +1,4 @@
-package pt.uc.dei.examples
+package pt.uc.dei.examples.email
 
 import scala.collection.immutable.List
 import scala.actors.Actor
@@ -8,12 +8,8 @@ import pt.uc.dei.cehm._
 class AddressDoesNotExistException extends Exception
 class IOException extends Exception
 
-case class Ack()
-case class MessageNotSent(val msg:String) extends Exception {
-  override def getMessage = msg
-}
 
-object App {
+object MessageSending {
   def main(args : Array[String]) {
       messageController.start
   }
@@ -28,13 +24,16 @@ object messageController extends Actor with ExceptionModel {
     
     var futures:List[MessageSender] = List()
     _try {
-      (1 to 15).foreach { m =>
+      (1 to 9).foreach { m =>
         val ms = new MessageSender
         ms.start
         ms ! m
         futures = ms :: futures
       }
+      
+      futures.foreach{ m => m !? Stop }
       _check
+      
     } _catch {
       e:RemoteException => 
         e.getException match {
@@ -42,8 +41,6 @@ object messageController extends Actor with ExceptionModel {
             case e:IOException => println("[Controller] IO error")
         }
     }
-    
-    futures.foreach{ m => m !? Stop }
     
     // Stop the system
     ExceptionController ! Stop
@@ -75,7 +72,7 @@ class MessageSender extends Actor with ExceptionModel {
     loop {
       react {
         case Stop => {
-          sender ! new Ack
+          sender ! Ack
           exit()
         }
         case i:Int => {

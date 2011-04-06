@@ -108,17 +108,12 @@
 	    <configuration>
 	      <launchers>
 	        <launcher>
-	          <id>App</id>
-	          <mainClass>pt.uc.dei.examples.App</mainClass>
-	          <!-- args are optional -->
-	          <args>
-	            <arg>arg1</arg>
-	          </args>
-	          <!-- jvmArgs are optional -->
-	          <jvmArgs>
-	            <jvmArg>-Xmx128m</jvmArg>
-	            <!--<jvmArg>-Djava.library.path=...</jvmArg>-->
-	          </jvmArgs>
+	          <id>MessageSending</id>
+	          <mainClass>pt.uc.dei.examples.email.MessageSending</mainClass>
+	        </launcher>
+			<launcher>
+	          <id>TreeMinimum</id>
+	          <mainClass>pt.uc.dei.examples.divide.TreeMinimum</mainClass>
 	        </launcher>
 	        <!-- you could define other launcher -->
 	      </launchers>

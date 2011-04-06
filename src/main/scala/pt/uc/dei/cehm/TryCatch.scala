@@ -1,8 +1,10 @@
 package pt.uc.dei.cehm
 
+import scala.reflect.{Manifest, ClassManifest}
+
 trait TryCatchDispatcher {
   def dispatch[E <: Exception](code:() => Unit, handler:Function[E,Unit], m:Manifest[E]):TryCatchExecuter[E] = {
-    if (m.erasure.isInstanceOf[RemoteException]) {
+    if (m <:< ClassManifest.fromClass(classOf[RemoteException])) {
       new TryCatchRemoteExecuter[E](code, handler, m)
     } else {
       new TryCatchExecuter[E](code, handler, m)

@@ -1,5 +1,6 @@
 package pt.uc.dei.cehm
 
+import scala.reflect.{Manifest, ClassManifest}
 import scala.collection.mutable.{Map, HashMap}
 import scala.actors.Actor
 import scala.actors.Actor._
@@ -18,7 +19,7 @@ case class Registration()
 
 object ExceptionController extends Actor {
   
-  val registry:Map[String, List[OutputChannel[Any]]] = new HashMap;
+  val registry:Map[Manifest[_], List[OutputChannel[Any]]] = new HashMap;
   
   def act() {
     loop {
@@ -31,7 +32,7 @@ object ExceptionController extends Actor {
           unregister(sender, r.getType)
           sender ! Ack
         }
-        case e:Exception => {
+        case e:RemoteException => {
           this << e
         }
         case Stop => exit()
@@ -41,25 +42,26 @@ object ExceptionController extends Actor {
   }
 
   def register(a:OutputChannel[Any], manif:Manifest[_]) = {
-    val t = manif.toString
+    val t = manif
     registry(t) = a :: (if (registry contains t) registry(t) else Nil)
   }
   
   def unregister(a:OutputChannel[Any], manif:Manifest[_]) = {
-    val t = manif.toString
+    val t = manif
     registry(t) = registry(t).filter( o => o.receiver != a.receiver )
   }
   
-  def << (e:Exception)(implicit m: Manifest[Exception]) = {
-    val t = m.toString
-    if (registry contains t) {
-      registry(t).foreach{ out =>
-        if (out.receiver.isInstanceOf[ExceptionModel]) {
-          out.receiver.asInstanceOf[ExceptionModel]._receive(e)
-        } else {
-          println("All actors should use the ExceptionModel")
-          System.exit(1)
-        }
+  def << (e:Exception) = {
+    registry.keys.foreach { k =>
+      if ( ClassManifest.singleType(e) <:< k ) {
+        registry(k).foreach { out =>
+          if (out.receiver.isInstanceOf[ExceptionModel]) {
+            out.receiver.asInstanceOf[ExceptionModel]._receive(e)
+          } else {
+            println("All actors should use the ExceptionModel")
+            System.exit(1)
+          }
+        } 
       }
     }
   }

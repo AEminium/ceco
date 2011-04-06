@@ -15,8 +15,8 @@ Run
 
 From the command-line execute:
 
-mvn scala:run -Dlauncher=App
-
+mvn scala:run -Dlauncher=MessageSending
+mvn scala:run -Dlauncher=TreeMinimum
 
 
 Authors
