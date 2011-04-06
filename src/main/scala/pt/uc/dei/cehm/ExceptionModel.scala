@@ -12,12 +12,12 @@ trait ExceptionModel extends Actor {
   /* Overwrite TryCatch and TryCatchFinally Statements */
   def _tryF(code: => Unit) {
     val f:( () => Unit) = { () => code }
-    new TryCatchFinally(f)
+    new TryCatchFinally(this, f)
   }
   
   def _try(code: => Unit) = {
     val f:( () => Unit) = { () => code }
-    new TryCatch(f)
+    new TryCatch(this, f)
   }
   
   def _throw(e:Exception) {
