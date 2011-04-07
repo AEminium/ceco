@@ -46,13 +46,14 @@ object Controller extends Actor with ExceptionModel {
     val fjtask = new FJMaximum
     fjtask.start
     _try {
-  
       val i:Any = fjtask !? tree
       _check
       println("Maximum: " + i)
     } _catch {
       e:InfiniteValue => println("Infinite value present in Tree")
     }
+    
+    
     ExceptionController ! Stop
     exit()
   }
@@ -64,6 +65,7 @@ class FJMaximum extends Actor with ExceptionModel {
       react {
         case e:Tree => {
           _try {
+            _check
             val ans = e match {
               case n:EmptyNode[_] => n.value match {
                   case Real(n) => n 
@@ -82,19 +84,18 @@ class FJMaximum extends Actor with ExceptionModel {
                 _check
                 val r:Int = process(t.right)().asInstanceOf[Int]
                 val l:Int = process(t.left)().asInstanceOf[Int]
-                _check
                 if (r > l) r else l
               }
             }
+            _check
             sender ! ans
-            exit()
           } _catch {
               e:InfiniteValue => {
                 println("Computation aborted")
-                sender ! 1
-                exit()
+                sender ! 0
               }
           }
+          exit()
         }
       }
     }

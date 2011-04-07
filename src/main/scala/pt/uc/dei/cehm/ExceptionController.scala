@@ -48,13 +48,19 @@ object ExceptionController extends Actor {
   
   def unregister(a:OutputChannel[Any], manif:Manifest[_]) = {
     val t = manif
-    registry(t) = registry(t).filter( o => o.receiver != a.receiver )
+    var b = true
+    registry(t) = registry(t).filterNot{ o => 
+        if (o.receiver == a.receiver && b)  {
+          b = false
+          true
+        } else false
+    }
   }
   
   def << (e:Exception) = {
     registry.keys.foreach { k =>
       if ( ClassManifest.singleType(e) <:< k ) {
-        registry(k).foreach { out =>
+        registry(k).distinct.foreach { out =>
           if (out.receiver.isInstanceOf[ExceptionModel]) {
             out.receiver.asInstanceOf[ExceptionModel]._receive(e)
           } else {
