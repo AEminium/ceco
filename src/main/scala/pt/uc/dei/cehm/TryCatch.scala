@@ -4,7 +4,7 @@ import scala.reflect.{Manifest, ClassManifest}
 
 trait TryCatchDispatcher {
   def dispatch[E <: Exception](actor:ExceptionModel,code:() => Unit, handler:Function[E,Unit], m:Manifest[E]):TryCatchExecuter[E] = {
-    if (m <:< ClassManifest.fromClass(classOf[RemoteException])) {
+    if (m <:< ClassManifest.fromClass(classOf[ConcurrentException])) {
       new TryCatchRemoteExecuter[E](actor, code, handler, m)
     } else {
       new TryCatchExecuter[E](code, handler, m)
@@ -43,7 +43,7 @@ class TryCatchRemoteExecuter[E <: Exception]
         
   def dispatchException(e:Exception) {
     e match {
-      case e:RemoteException => e match {
+      case e:ConcurrentException => e match {
           case e:E => catcher(e)
           case _ => {
             ExceptionController !? new Unregister[E](m)

@@ -6,7 +6,7 @@ import scala.actors.Actor._
 import scala.util.Random
 import pt.uc.dei.cehm._
 
-class InfiniteValue extends RemoteException
+class InfiniteValue extends ConcurrentException
 
 sealed abstract class Tree
 case class Node(left: Tree, right: Tree) extends Tree

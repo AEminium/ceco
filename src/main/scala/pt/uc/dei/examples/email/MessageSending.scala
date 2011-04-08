@@ -5,8 +5,8 @@ import scala.actors.Actor
 import scala.actors.Actor._
 import pt.uc.dei.cehm._
 
-class AddressDoesNotExistException(val email:String) extends RemoteException
-class IOException(val email:String) extends RemoteException
+class InvalidAddressException(val email:String) extends ConcurrentException
+class IOException(val email:String) extends ConcurrentException
 
 
 object MessageSending {
@@ -42,9 +42,9 @@ object messageController extends Actor with ExceptionModel {
         _check
     
       } _catch {
-        e:RemoteException => 
+        e:ConcurrentException => 
           e match {
-              case e:AddressDoesNotExistException => {
+              case e:InvalidAddressException => {
                 database = database - e.email
                 println("[Controller] " + e.email + " does not exist")
               }
@@ -68,7 +68,7 @@ class MessageSender extends Actor with ExceptionModel {
     _try {
       if (i == 3) {
         Thread.sleep(5*1000)
-        _throw (new AddressDoesNotExistException(e))
+        _throw (new InvalidAddressException(e))
       } else if ( i == 7 && fakeError) {
         Thread.sleep(5*1000)
         fakeError = false
