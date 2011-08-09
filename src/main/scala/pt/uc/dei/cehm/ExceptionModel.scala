@@ -11,13 +11,19 @@ trait ExceptionModel extends Actor {
 
   /* Overwrite TryCatch and TryCatchFinally Statements */
   def _tryF(code: => Unit) {
-    val f:( () => Unit) = { () => code }
-    new TryCatchFinally(this, f)
+    new TryCatchFinally(this, wrapBlock(code))
   }
-  
+
+	def _async_tryF(code: => Unit) = {
+    new AsyncTryCatchFinally(this, wrapBlock(code))
+  }
+
   def _try(code: => Unit) = {
-    val f:( () => Unit) = { () => code }
-    new TryCatch(this, f)
+    new TryCatch(this, wrapBlock(code))
+  }
+
+	def _async_try(code: => Unit) = {
+    new AsyncTryCatch(this, wrapBlock(code))
   }
   
   def _throw(e:Exception) {
@@ -33,8 +39,15 @@ trait ExceptionModel extends Actor {
     if (!exceptionQueue.isEmpty) throw exceptionQueue.dequeue
   }
   
+	/* Internal stuff */
+	
   def _receive(e:Exception) {
     exceptionQueue enqueue e
   }
+
+	private def wrapBlock(code: => Unit) = {
+		val f:( () => Unit) = { () => code }
+		f
+	}
   
 }

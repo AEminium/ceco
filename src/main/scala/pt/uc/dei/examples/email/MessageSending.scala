@@ -92,7 +92,7 @@ object MessageController extends Actor with ExceptionModel {
           }
       }
     }
-    
+    println("[Controller] Stopping")
     // No longer needed.
     ExceptionController ! Stop
   }

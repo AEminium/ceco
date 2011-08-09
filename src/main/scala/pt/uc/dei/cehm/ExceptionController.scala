@@ -9,17 +9,44 @@ import scala.actors.OutputChannel
 case object Ack
 case object Stop
 case class Register[E <: Exception](m: Manifest[E]) {
-  def getType() = m
+  def getType = m
+}
+case class RegisterThread[E <: Exception](t:Thread, m: Manifest[E]) {
+	def getThread = t
+  def getType = m
 }
 case class Unregister[E <: Exception](m: Manifest[E]) {
-  def getType() = m
+  def getType = m
 }
 
-case class Registration()
+abstract class ExceptionMessenger(out:OutputChannel[Any]) {
+	def getId = out.receiver
+	def deliver(e:Exception):Unit
+}
+
+class SyncExceptionMessenger(out:OutputChannel[Any]) extends ExceptionMessenger(out) {
+	override def deliver(e:Exception) {
+		if (out.receiver.isInstanceOf[ExceptionModel]) {
+      out.receiver.asInstanceOf[ExceptionModel]._receive(e)
+    } else {
+      println("All actors should use the ExceptionModel")
+      System.exit(1)
+    }
+	}
+}
+
+class AsyncExceptionMessenger(out:OutputChannel[Any], t:Thread) extends SyncExceptionMessenger(out) {
+	override def deliver(e:Exception) {
+		super.deliver(e)
+		t.interrupt
+	}
+}
+
 
 object ExceptionController extends Actor {
   
-  val registry:Map[Manifest[_], List[OutputChannel[Any]]] = new HashMap;
+	var shouldShutdown = false
+  val registry:Map[Manifest[_], List[ExceptionMessenger]] = new HashMap;
   
   def act() {
     loop {
@@ -28,46 +55,57 @@ object ExceptionController extends Actor {
           register(sender, r.getType)
           sender ! Ack
         }
+        case r:RegisterThread[_] => {
+          register(sender, r.getThread, r.getType)
+          sender ! Ack
+        }
         case r:Unregister[_] => {
           unregister(sender, r.getType)
           sender ! Ack
+					checkExit
         }
         case e:Exception => {
           this << e
         }
-        case Stop => exit()
+        case Stop => {
+					shouldShutdown = true
+					checkExit
+				}
         case _ => println("Unknown option.")
       }
     }
   }
 
-  def register(a:OutputChannel[Any], manif:Manifest[_]) = {
+	def checkExit = {
+		if (shouldShutdown && (registry.size == 0 || registry.values.map(_.length).sum == 0)) exit()
+	}
+
+
+  def register(a:OutputChannel[Any], t:Thread, manif:Manifest[_]):Unit = registerMessenger(new AsyncExceptionMessenger(a,t), manif)
+  def register(a:OutputChannel[Any], manif:Manifest[_]):Unit = registerMessenger(new SyncExceptionMessenger(a), manif)
+
+  def registerMessenger(k:ExceptionMessenger, manif:Manifest[_]) {
     val t = manif
-    registry(t) = a :: (if (registry contains t) registry(t) else Nil)
+    registry(t) = k :: (if (registry contains t) registry(t) else Nil)
   }
   
   def unregister(a:OutputChannel[Any], manif:Manifest[_]) = {
     val t = manif
-    var b = true
-    registry(t) = registry(t).filterNot{ o => 
-        if (o.receiver == a.receiver && b)  {
-          b = false
-          true
-        } else false
-    }
+		if (registry contains t) {
+	    var b = true
+	    registry(t) = registry(t).filterNot{ o => 
+	        if (o.getId == a.receiver && b)  {
+	          b = false
+	          true
+	        } else false
+	    }
+		}
   }
   
   def << (e:Exception) = {
     registry.keys.foreach { k =>
       if ( ClassManifest.singleType(e) <:< k ) {
-        registry(k).distinct.foreach { out =>
-          if (out.receiver.isInstanceOf[ExceptionModel]) {
-            out.receiver.asInstanceOf[ExceptionModel]._receive(e)
-          } else {
-            println("All actors should use the ExceptionModel")
-            System.exit(1)
-          }
-        } 
+        registry(k).distinct.foreach(_.deliver(e))
       }
     }
   }
