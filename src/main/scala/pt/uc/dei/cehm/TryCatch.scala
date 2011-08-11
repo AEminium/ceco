@@ -76,7 +76,7 @@ class TryCatchRemoteExecuter[E <: Exception]
 		if (async)
 			async_finally(fin)
 		else
-			sync_finally(fin, true)
+			sync_finally(fin)
 	}
 	
 	def async_finally(fin: => Unit) {

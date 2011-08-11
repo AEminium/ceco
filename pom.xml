@@ -2,10 +2,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>pt.uc.dei</groupId>
 	<artifactId>exceptionmodel</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.1</version>
 	<name>CEHM</name>
-	<description>My wonderfull scala app</description>
-	<inceptionYear>2010</inceptionYear>
+	<description>Concurrent Exception Handling Model</description>
+	<inceptionYear>2011</inceptionYear>
 	<licenses>
 		<license>
 			<name>My License</name>
@@ -119,7 +119,10 @@
 							<id>AsyncExample</id>
 							<mainClass>pt.uc.dei.examples.async.AsyncExample</mainClass>
 						</launcher>
-
+						<launcher>
+							<id>Pipeline</id>
+							<mainClass>pt.uc.dei.examples.pipeline.Pipeline</mainClass>
+						</launcher>
 						<!-- you could define other launcher -->
 					</launchers>
 				</configuration>

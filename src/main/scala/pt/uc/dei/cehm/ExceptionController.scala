@@ -71,7 +71,7 @@ object ExceptionController extends Actor {
 					shouldShutdown = true
 					checkExit
 				}
-        case _ => println("Unknown option.")
+        case _ => System.err.println("[Warning] ExceptionController has just received garbage messages.")
       }
     }
   }
