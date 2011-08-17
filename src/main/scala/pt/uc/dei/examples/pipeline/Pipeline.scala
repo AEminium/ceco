@@ -4,8 +4,10 @@ import scala.actors.Actor
 import scala.actors.Actor._
 import pt.uc.dei.cehm._
 
-class PreprocessingFault extends ConcurrentException
-class ProcessingFault extends ConcurrentException
+case class Ack
+
+class PreprocessingFault(val i:Int) extends ConcurrentException
+class ProcessingFault(val i:Int) extends ConcurrentException
 
 
 object Pipeline {
@@ -15,87 +17,103 @@ object Pipeline {
 		Preprocessing.start
 		Processing.start
 		Dispatcher.start
-
-		1.until(10).foreach(Receiver ! _)
-		
-		Receiver ! Stop
+		Receiver ! 1
   }
 }
 
-object Dispatcher extends PipelineUnit[Int](ExceptionController) {
+object Dispatcher extends PipelineUnit(ExceptionController) {
+	var counter:List[Int] = List()
 	def work(u:Int) = {
-		println("[Dis] Dispatching " + u)
+		println("[4] Dispatching " + u)
 		Thread.sleep(1*1000)
-		println("[Dis] Dispatched  " + u)
+		counter = u :: counter
+		println("[4] Dispatched  " + counter)
+		if (u == Receiver.expected) {
+			Processing ! Stop
+			Preprocessing ! Stop
+			Receiver ! Stop
+			ExceptionController ! Stop
+			this ! Stop
+		}
 	}
 }
 
-object Processing extends PipelineUnit[Int](Dispatcher) {
+object Processing extends PipelineUnit(Dispatcher) {
+	var failFirstTime = true
 	def work(u:Int) = {
 		_async_try {
-			println("[Pro] Processing " + u)
-			if ( u == 4) {
-				println("[Pro] Fault at Processing. Stoping elements behind.")
-				_throw(new ProcessingFault)
+			println("[3] Processing " + u)
+			if ( u == 3 && failFirstTime ) {
+				println("[3] Fault at Processing. Stoping elements behind.")
+				failFirstTime = false
+				_throw(new ProcessingFault(u))
 			}
 			Thread.sleep(1*1000)
-			println("[Pro] Processed " + u)
+			println("[3] Processed " + u)
 			next ! u
 		} _catch {
 			e:ProcessingFault => {
-				println("[Pro] Reason to stop: " + e)
-				alive = false
+				discardAbove = e.i
+				println("[3] Reason to stop: " + e.i)
 			}
 		}
 	}
 }
 
-object Preprocessing extends PipelineUnit[Int](Processing) {
+object Preprocessing extends PipelineUnit(Processing) {
 	def work(u:Int) = {
 		_async_try {
-			println("[Pre] Preprocessing " + u)
+			println("[2] Preprocessing " + u)
 			Thread.sleep(3*1000)
-			println("[Pre] Preprocessed " + u)
+			println("[2] Preprocessed " + u)
 			next ! u
 		} _catch {
 			e:ProcessingFault => {
-				println("[Pre] Reason to stop: " + e)
-				_raise(new PreprocessingFault)
-				alive = false
+				println("[2] Reason to stop: " + e.i)
+				discardAbove = e.i
+				_raise(new PreprocessingFault(e.i))
 			}
 		}
 	}
 }
 
-object Receiver extends PipelineUnit[Int](Preprocessing) {
+object Receiver extends PipelineUnit(Preprocessing) {
+	val expected = 5
 	def work(u:Int) = {
-		_async_try {
-			println("[Rec] Receiving " + u)
-			Thread.sleep(1*1000)
-			next ! u
-		} _catch {
-			e:PreprocessingFault => {
-				println("[Rec] Reason to stop: " + e)
-				ExceptionController ! Stop
-				alive = false
+		var done = false
+		var start = u
+		while (!done) {
+			_async_try {
+				println("[1] Receiving " + start)
+				start.until(expected+1).foreach { 
+					i => next ! i 
+					Thread.sleep(3*1000)
+				}
+				done = true
+			} _catch {
+				e:PreprocessingFault => {
+					println("[1] REBOOT TO: " + e.i)
+					start = e.i
+				}
 			}
 		}
 	}
 }
 
-abstract class PipelineUnit[K](val next:Actor) extends Actor with ExceptionModel {
-	var alive = true
-	def work(u:K):Unit
+abstract class PipelineUnit(val next:Actor) extends Actor with ExceptionModel {
+	var discardAbove = 1
+	def work(u:Int):Unit
 	def act {
 		loop {
 			react {
 				case Stop => {
-					next ! Stop
 					exit()
 				}
-				case u:K => {
-					if (alive) work(u)
-					else this ! u
+				case u:Int => {
+					if ( u <= discardAbove) {
+						work(u)
+						discardAbove = discardAbove.max(u+1)
+					}
 				}
 			}
 		}
