@@ -3,8 +3,8 @@
 	<groupId>pt.uc.dei</groupId>
 	<artifactId>exceptionmodel</artifactId>
 	<version>1.1</version>
-	<name>CEHM</name>
-	<description>Concurrent Exception Handling Model</description>
+	<name>CECO</name>
+	<description>Cooperative Exceptions for Concurrent Objects Model</description>
 	<inceptionYear>2011</inceptionYear>
 	<licenses>
 		<license>

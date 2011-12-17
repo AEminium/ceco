@@ -1,3 +1,3 @@
-package pt.uc.dei.cehm
+package pt.uc.dei.ceco
 
 trait ConcurrentException extends Exception

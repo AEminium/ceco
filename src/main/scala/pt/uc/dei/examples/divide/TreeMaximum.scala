@@ -13,7 +13,7 @@ import scala.collection.immutable.List
 import scala.actors.Actor
 import scala.actors.Actor._
 import scala.util.Random
-import pt.uc.dei.cehm._
+import pt.uc.dei.ceco._
 
 
 /*

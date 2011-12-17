@@ -2,7 +2,7 @@ package pt.uc.dei.examples.pipeline
 
 import scala.actors.Actor
 import scala.actors.Actor._
-import pt.uc.dei.cehm._
+import pt.uc.dei.ceco._
 
 case class Ack
 
