@@ -10,12 +10,12 @@ from database.
 the MessageController should retry to send it.
 
 */
-package pt.uc.dei.examples.email
+package examples.email
 
 import scala.collection.immutable.List
 import scala.actors.Actor
 import scala.actors.Actor._
-import pt.uc.dei.ceco._
+import ceco._
 
 
 /* Both exceptions are ConcurrentExceptions  */

@@ -109,19 +109,24 @@
 					<launchers>
 						<launcher>
 							<id>MessageSending</id>
-							<mainClass>pt.uc.dei.examples.email.MessageSending</mainClass>
+							<mainClass>examples.email.MessageSending</mainClass>
 						</launcher>
 						<launcher>
 							<id>TreeMaximum</id>
-							<mainClass>pt.uc.dei.examples.divide.TreeMaximum</mainClass>
+							<mainClass>examples.divide.TreeMaximum</mainClass>
 						</launcher>
 						<launcher>
+							<id>PlainTreeMaximum</id>
+							<mainClass>examples.divide.PlainTreeMaximum</mainClass>
+						</launcher>
+						
+						<launcher>
 							<id>AsyncExample</id>
-							<mainClass>pt.uc.dei.examples.async.AsyncExample</mainClass>
+							<mainClass>examples.async.AsyncExample</mainClass>
 						</launcher>
 						<launcher>
 							<id>Pipeline</id>
-							<mainClass>pt.uc.dei.examples.pipeline.Pipeline</mainClass>
+							<mainClass>examples.pipeline.Pipeline</mainClass>
 						</launcher>
 						<!-- you could define other launcher -->
 					</launchers>

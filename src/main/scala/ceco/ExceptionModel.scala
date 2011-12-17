@@ -1,4 +1,4 @@
-package pt.uc.dei.ceco
+package ceco
 
 import scala.collection.mutable.{Queue, SynchronizedQueue,HashMap}
 import scala.actors.Actor

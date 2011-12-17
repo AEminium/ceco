@@ -1,8 +1,8 @@
-package pt.uc.dei.examples.async
+package examples.async
 
 import scala.actors.Actor
 import scala.actors.Actor._
-import pt.uc.dei.ceco._
+import ceco._
 
 class StopException extends ConcurrentException
 

@@ -1,4 +1,4 @@
-package pt.uc.dei.ceco
+package ceco
 
 import scala.reflect.{Manifest, ClassManifest}
 import scala.collection.mutable.{Map, HashMap}

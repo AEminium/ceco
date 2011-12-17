@@ -1,8 +1,8 @@
-package pt.uc.dei.examples.pipeline
+package examples.pipeline
 
 import scala.actors.Actor
 import scala.actors.Actor._
-import pt.uc.dei.ceco._
+import ceco._
 
 case class Ack
 

@@ -1,3 +1,3 @@
-package pt.uc.dei.ceco
+package ceco
 
 trait ConcurrentException extends Exception

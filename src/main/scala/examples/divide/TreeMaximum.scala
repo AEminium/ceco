@@ -7,13 +7,12 @@ may be prevented using Concurrent exceptions.
 
 */
 
-package pt.uc.dei.examples.divide
+package examples.divide
 
 import scala.collection.immutable.List
 import scala.actors.Actor
 import scala.actors.Actor._
-import scala.util.Random
-import pt.uc.dei.ceco._
+import ceco._
 
 
 /*
@@ -22,16 +21,6 @@ In order to catch it from other actors,
 it must inherit from ConcurrentException
 */
 class InfiniteValue extends ConcurrentException
-
-/* Recursive Tree data structure */
-sealed abstract class Tree
-case class Node(left: Tree, right: Tree) extends Tree
-case class EmptyNode[A](value:A) extends Tree
-
-/* Number class with support for Infinite value */
-sealed abstract class Number
-case class Real(n:Int) extends Number
-case object Inf extends Number
 
 /* Main method will only start the Controller method */
 object TreeMaximum {
@@ -46,32 +35,13 @@ To use ConcurrentExceptions, the actor integrates the
 ExceptionModel trait.
 */
 object Controller extends Actor with ExceptionModel {
-  val rand = new Random
-  
-  /*
-  Generates a new unbalanced tree with up to 10 levels,
-  filled with numbers from 1 to 8 and Infinite.
-  */
-  def createRandomTree(n:Int):Tree = {
-    if (rand.nextInt(10) < n) {
-      def map(i:Int):Number = {
-        i match {
-            case 9 => Inf
-            case _ => Real(i)
-        }
-      }
-      EmptyNode[Number](map(rand.nextInt(10)))
-    } else {
-      Node(createRandomTree(n+1), createRandomTree(n+1))
-    }
-  }
   
   def act() {
     
     /* ExceptionController delivers exceptions to interested actors */
     ExceptionController.start
     
-    val tree = createRandomTree(0);
+    val tree = TreeFactory.createRandomTree(0);
     val fjtask = new FJMaximum
     fjtask.start
 
