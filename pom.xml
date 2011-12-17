@@ -112,6 +112,11 @@
 							<mainClass>examples.email.MessageSending</mainClass>
 						</launcher>
 						<launcher>
+							<id>PlainMessageSending</id>
+							<mainClass>examples.email.PlainMessageSending</mainClass>
+						</launcher>
+						
+						<launcher>
 							<id>TreeMaximum</id>
 							<mainClass>examples.divide.TreeMaximum</mainClass>
 						</launcher>
@@ -121,12 +126,13 @@
 						</launcher>
 						
 						<launcher>
-							<id>AsyncExample</id>
-							<mainClass>examples.async.AsyncExample</mainClass>
-						</launcher>
-						<launcher>
 							<id>Pipeline</id>
 							<mainClass>examples.pipeline.Pipeline</mainClass>
+						</launcher>
+						
+						<launcher>
+							<id>AsyncExample</id>
+							<mainClass>examples.async.AsyncExample</mainClass>
 						</launcher>
 						<!-- you could define other launcher -->
 					</launchers>
