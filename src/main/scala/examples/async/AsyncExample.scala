@@ -1,3 +1,8 @@
+/*
+This example stars a worker that lasts for 10s and a controller
+that will raise an exception after 5s and propagate it to the
+worker immediatly.
+*/
 package examples.async
 
 import scala.actors.Actor

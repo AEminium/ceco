@@ -1,3 +1,16 @@
+/*
+This example represents a pipeline structure of actors, as follows:
+
+Receiver -> Preprocessing -> Processing -> Dispatcher
+
+The Receiver actor sends messages to next actor and so on, and each
+actor performs some work inside.
+
+If there is an error on one actor (Processing), it will stop the
+previous actors, correct the situation and restart that process
+from the receiver,
+
+*/
 package examples.pipeline
 
 import scala.actors.Actor
