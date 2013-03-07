@@ -16,10 +16,10 @@ object TreeFactory {
   */
   def createRandomTree(n: Int): Tree = {
     if (rand.nextInt(10) < n) {
-     val i = rand.nextInt(10)
-     i match {
-        case 9 => InfNode
-        case _ => RealNode(i)
+      val i = rand.nextInt(10)
+      i match {
+        case 9 ⇒ InfNode
+        case _ ⇒ RealNode(i)
       }
     } else {
       Node(createRandomTree(n + 1), createRandomTree(n + 1))

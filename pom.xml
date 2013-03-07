@@ -134,11 +134,31 @@
 							<id>AsyncExample</id>
 							<mainClass>examples.async.AsyncExample</mainClass>
 						</launcher>
+						
+						<launcher>
+							<id>ConcNameResolver</id>
+							<mainClass>ConcNameResolver</mainClass>
+						</launcher>
 						<!-- you could define other launcher -->
 					</launchers>
 				</configuration>
 			</plugin>
-
+			<plugin>
+			  <groupId>org.scalariform</groupId>
+			  <artifactId>scalariform-maven-plugin</artifactId>
+			  <version>0.1.3</version>
+			  <executions>
+			    <execution>
+			      <phase>process-sources</phase>
+			      <goals>
+			        <goal>format</goal>
+			      </goals>
+			      <configuration>
+			        <rewriteArrowSymbols>true</rewriteArrowSymbols>
+			      </configuration>
+			    </execution>
+			  </executions>
+			</plugin>
 		</plugins>
 	</build>
 </project>

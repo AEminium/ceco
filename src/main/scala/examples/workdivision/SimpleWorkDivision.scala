@@ -18,9 +18,9 @@ object ErrorCounter extends Actor {
   def act() {
     loop {
       react {
-        case e: InfiniteValue => hasErrors = true
-        case AreThereErrors => sender ! hasErrors
-        case Stop => exit()
+        case e: InfiniteValue ⇒ hasErrors = true
+        case AreThereErrors ⇒ sender ! hasErrors
+        case Stop ⇒ exit()
       }
     }
   }
@@ -52,14 +52,14 @@ class SimpleWorker extends Actor {
   def act() {
     loop {
       react {
-        case e: Tree => {
+        case e: Tree ⇒ {
           val ans = e match {
-           case n: RealNode => n.value
-           case InfNode => {
-                ErrorCounter ! new InfiniteValue
-                0
-           }
-           case t: Node => {
+            case n: RealNode ⇒ n.value
+            case InfNode ⇒ {
+              ErrorCounter ! new InfiniteValue
+              0
+            }
+            case t: Node ⇒ {
               try {
                 checkForErrors
                 val r = ((new SimpleWorker).start !! t.right)().asInstanceOf[Int]
@@ -67,7 +67,7 @@ class SimpleWorker extends Actor {
                 checkForErrors
                 if (r > l) r else l
               } catch {
-                case e: InfiniteValue => {
+                case e: InfiniteValue ⇒ {
                   println("Aborting Computation")
                   0
                 }
