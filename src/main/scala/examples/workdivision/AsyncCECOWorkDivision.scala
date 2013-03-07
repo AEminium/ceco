@@ -37,9 +37,9 @@ class AsyncWorker extends Actor with ExceptionModel {
             val ans = e match {
               case n: RealNode => n.value
               case InfNode => {
-                  println("Found an infinite value.")
-                  _throw(new InfiniteValue)
-                  0
+                println("Found an infinite value.")
+                _throw(new InfiniteValue)
+                0
               }
               case t: Node => {
                 val r = ((new Worker).start !! t.right)().asInstanceOf[Int]
@@ -50,10 +50,11 @@ class AsyncWorker extends Actor with ExceptionModel {
             _check
             sender ! ans
           } _catch {
-            e:InfiniteValue => {
-            	println("Computation aborted")
+            e: InfiniteValue =>
+              {
+                println("Computation aborted")
                 sender ! 0
-            }
+              }
           }
           exit()
         }

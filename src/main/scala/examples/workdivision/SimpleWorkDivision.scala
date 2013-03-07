@@ -54,12 +54,12 @@ class SimpleWorker extends Actor {
       react {
         case e: Tree => {
           val ans = e match {
-           case n: RealNode => n.value
-           case InfNode => {
-                ErrorCounter ! new InfiniteValue
-                0
-           }
-           case t: Node => {
+            case n: RealNode => n.value
+            case InfNode => {
+              ErrorCounter ! new InfiniteValue
+              0
+            }
+            case t: Node => {
               try {
                 checkForErrors
                 val r = ((new SimpleWorker).start !! t.right)().asInstanceOf[Int]
